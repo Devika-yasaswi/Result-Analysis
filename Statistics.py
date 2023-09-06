@@ -27,6 +27,18 @@ def branch_calculation(data,overall_stat,branch):
     overall_stat.loc[len(overall_stat.index)]=new
     return df,overall_stat
     
+def failure_count(data):
+        count=len(data)
+        df=DataFrame(columns=["No.of Failed Subjects","No.of Failures"])
+        backlog_list=data["Backlogs"].tolist()
+        new=["All Pass"]
+        new.append(backlog_list.count(0))
+        df.loc[len(df.index)]=new
+        for i in range(1,max(backlog_list)+1):
+            new=[str(i)+" Subject Failed"]
+            new.append(backlog_list.count(i))
+            df.loc[len(df.index)]=new
+        return df,count
 
 def get_statistics(file):
     civil_data=read_excel(file,sheet_name=["CE"])
@@ -40,6 +52,11 @@ def get_statistics(file):
     cse_data=read_excel(file,sheet_name=["CSE"])
     cse_data=cse_data["CSE"]
     overall_data=DataFrame(columns=["Branch","Total","Appeared","Pass","Fail","Percentage"])
+    civil_df,civil=failure_count(civil_data)
+    eee_df,eee=failure_count(eee_data)
+    mech_df,mech=failure_count(mech_data)
+    ece_df,ece=failure_count(ece_data)
+    cse_df,cse=failure_count(cse_data)
     civil_data,overall_data=branch_calculation(civil_data,overall_data,"CE")
     eee_data,overall_data=branch_calculation(eee_data,overall_data,"EEE")
     mech_data,overall_data=branch_calculation(mech_data,overall_data,"ME")
@@ -59,55 +76,10 @@ def get_statistics(file):
         ece_data.to_excel(output,sheet_name="ECE Analysis",index=False)
         cse_data.to_excel(output,sheet_name="CSE Analysis",index=False)
         overall_data.to_excel(output,sheet_name="Overall Analysis",index=False)
-    civil_data=read_excel(file,sheet_name=["CE"])
-    civil_data=civil_data["CE"]
-    civil=len(civil_data)
-    civil_df=DataFrame(columns=["No.of Failed Subjects","No.of Failures"])
-    backlog_list=civil_data["Backlogs"].tolist()
-    for i in range(1,max(backlog_list)+1):
-        new=[str(i)+" Subject"]
-        new.append(backlog_list.count(i))
-        civil_df.loc[len(civil_df.index)]=new
-    eee_data=read_excel(file,sheet_name=["EEE"])
-    eee_data=eee_data["EEE"]
-    eee=len(eee_data)
-    eee_df=DataFrame(columns=["No.of Failed Subjects","No.of Failures"])
-    backlog_list=eee_data["Backlogs"].tolist()
-    for i in range(1,max(backlog_list)+1):
-        new=[str(i)+" Subject"]
-        new.append(backlog_list.count(i))
-        eee_df.loc[len(eee_df.index)]=new
-    mech_data=read_excel(file,sheet_name=["ME"])
-    mech_data=mech_data["ME"]
-    mech=len(mech_data)
-    mech_df=DataFrame(columns=["No.of Failed Subjects","No.of Failures"])
-    backlog_list=mech_data["Backlogs"].tolist()
-    for i in range(1,max(backlog_list)+1):
-        new=[str(i)+" Subject"]
-        new.append(backlog_list.count(i))
-        mech_df.loc[len(mech_df.index)]=new
-    ece_data=read_excel(file,sheet_name=["ECE"])
-    ece_data=ece_data["ECE"]
-    ece=len(ece_data)
-    ece_df=DataFrame(columns=["No.of Failed Subjects","No.of Failures"])
-    backlog_list=ece_data["Backlogs"].tolist()
-    for i in range(1,max(backlog_list)+1):
-        new=[str(i)+" Subject"]
-        new.append(backlog_list.count(i))
-        ece_df.loc[len(ece_df.index)]=new
-    cse_data=read_excel(file,sheet_name=["CSE"])
-    cse_data=cse_data["CSE"]
-    cse=len(cse_data)
-    cse_df=DataFrame(columns=["No.of Failed Subjects","No.of Failures"])
-    backlog_list=cse_data["Backlogs"].tolist()
-    for i in range(1,max(backlog_list)+1):
-        new=[str(i)+" Subject"]
-        new.append(backlog_list.count(i))
-        cse_df.loc[len(cse_df.index)]=new
 
     with ExcelWriter(file,engine='openpyxl',mode='a',if_sheet_exists="overlay") as output:
-        civil_df.to_excel(output,sheet_name="CE",startrow=civil+3,index=False)
-        eee_df.to_excel(output,sheet_name="EEE",startrow=eee+3,index=False)
-        mech_df.to_excel(output,sheet_name="ME",startrow=mech+3,index=False)
-        ece_df.to_excel(output,sheet_name="ECE",startrow=ece+3,index=False)
-        cse_df.to_excel(output,sheet_name="CSE",startrow=cse+3,index=False)
+        civil_df.to_excel(output,sheet_name="CE",startrow=civil+3,startcol=4,index=False,header=False)
+        eee_df.to_excel(output,sheet_name="EEE",startrow=eee+3,startcol=4,index=False,header=False)
+        mech_df.to_excel(output,sheet_name="ME",startrow=mech+3,startcol=4,index=False,header=False)
+        ece_df.to_excel(output,sheet_name="ECE",startrow=ece+3,startcol=4,index=False,header=False)
+        cse_df.to_excel(output,sheet_name="CSE",startrow=cse+3,startcol=4,index=False,header=False)
