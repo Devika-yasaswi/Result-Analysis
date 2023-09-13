@@ -12,7 +12,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 def Sgpa(data,input):
     #Initializations
-    global GPA,a,roll_no,student_data,start,start_x,df,civil_credits,eee_credits,mech_credits,ece_credits,cse_credits,GBM,tc
+    global GPA,a,roll_no,student_data,start,start_x,df,civil_credits,eee_credits,mech_credits,ece_credits,cse_credits,GBM,tc,civil_subs,eee_subs,mech_subs,ece_subs,cse_subs,total_subs
     roll_no=0    #Variable for collectig last three digis of the RollNo
     a=0    #
     GPA=0.0
@@ -28,51 +28,95 @@ def Sgpa(data,input):
     mech_credits=0
     ece_credits=0
     cse_credits=0
+    civil_list=[]
+    eee_list=[]
+    mech_list=[]
+    ece_list=[]
+    cse_list=[]
     GBM=0
     tc=0
     df1=pd.DataFrame({"Files updated ":[input]})
 
     #Deleting data frame for the creation of new branch dataframe with same name
     def delete():
-            global df
-            d=df
-            del df
-            del d
-            df=pd.DataFrame({"Roll_No":[]})
-            #print(len(df))
+        global df
+        d=df
+        del df
+        del d
+        df=pd.DataFrame({"Roll_No":[]})
+        return df
         
     #Calculation and entering marks of the student into data frame
     files=[('xlsx files','*.xlsx')]
     file=asksaveasfile(mode='wb',filetypes = files,defaultextension=files)
 
-    #Calculating credits
+    #Finding subjects
     for i in range(len(data)):
         x=int(data.iloc[i,0][7:10])
+        if data.iloc[i,0] not in student_data:
+            if x//100==1 and int(data.iloc[i-1,0][7])!=5:
+                 civil_list.append(sub)
+            elif x//100==2 and int(data.iloc[i-1,0][7])!=1:
+                 eee_list.append(sub)
+            elif x//100==3 and int(data.iloc[i-1,0][7])!=2:
+                 mech_list.append(sub)
+            elif x//100==4 and int(data.iloc[i-1,0][7])!=3:
+                 ece_list.append(sub)
+            elif x//100==5 and int(data.iloc[i-1,0][7])!=4:
+                 cse_list.append(sub)
+            sub=[]
+            student_data=[data.iloc[i,0]]
         if data.iloc[i,1] not in sub:
             sub.append(data.iloc[i,1])
             total+=float(data.iloc[i,-1])
-            student_data.append(data.iloc[i,-2])
+            student_data.append(data.iloc[i,-2]) 
+    def sub_selection(subs):
+        new_sub=[]
+        count=[]
+        for i in subs:
+             if i not in new_sub:
+                  new_sub.append(i)
+        #print(new_sub)
+        for i in range(len(new_sub)):
+            count.append(len(new_sub[i]))
+        min_val=count.index(min(count))
+        return new_sub[min_val]
+    civil_subs=sub_selection(civil_list)
+    eee_subs=sub_selection(eee_list)
+    mech_subs=sub_selection(mech_list)
+    ece_subs=sub_selection(ece_list)
+    cse_subs=sub_selection(cse_list)
+    #print(civil_subs,eee_subs,mech_subs,ece_subs,cse_subs)
+    #Calculating credits
+    for i in range(len(data)):
+        x=int(data.iloc[i,0][7:10])
         if data.iloc[i,0] not in student_data:
             if x//100==1:
-                if "MP" not in student_data and 'F' not in student_data and "AB" not in student_data:
-                     civil_credits=total
+                if "MP" not in student_data and 'F' not in student_data and "AB" not in student_data and sub==civil_subs:
+                    civil_credits=total
+                     
             elif x//100==2:
-                if "MP" not in student_data and 'F' not in student_data and "AB" not in student_data:
+                if "MP" not in student_data and 'F' not in student_data and "AB" not in student_data and sub==eee_subs:
                      eee_credits=total
+                
             elif x//100==3:
-                if "MP" not in student_data and 'F' not in student_data and "AB" not in student_data:
-                     mech_credits=total
-            elif x//100==4:
-                if "MP" not in student_data and 'F' not in student_data and "AB" not in student_data:
+                if "MP" not in student_data and 'F' not in student_data and "AB" not in student_data and sub==mech_subs:
+                    mech_credits=total
+            elif x//100==4:                
+                if "MP" not in student_data and 'F' not in student_data and "AB" not in student_data and sub==ece_subs:
                      ece_credits=total
             elif x//100==5:
-                if "MP" not in student_data and 'F' not in student_data and "AB" not in student_data:
+                if "MP" not in student_data and 'F' not in student_data and "AB" not in student_data and sub==cse_subs:
                      cse_credits=total
             #print(student_data)
             #print(x," ",civil_credits," ",eee_credits," ",mech_credits," ",ece_credits," ",cse_credits)
             sub=[]
             total=0
-            student_data=[data.iloc[i,0]]        
+            student_data=[data.iloc[i,0]]  
+        if data.iloc[i,1] not in sub:
+            sub.append(data.iloc[i,1])
+            total+=float(data.iloc[i,-1])
+            student_data.append(data.iloc[i,-2])      
     #print(civil_credits," ",eee_credits," ",mech_credits," ",ece_credits," ",cse_credits)
     student_data=[]
     #calculating and writing GPA to output file
@@ -105,7 +149,7 @@ def Sgpa(data,input):
                         student_data.append("Fail")
                     student_data.append(student_data.count("F")+student_data.count("AB")+student_data.count("MP")+student_data.count("ABSENT"))
                     student_data.append(tc)
-                    student_data.append(GBM/(len(sub)-(student_data.count("COMPLE")+student_data.count("COMPLETED"))))
+                    student_data.append(GBM/(len(total_subs)-(student_data.count("COMPLE")+student_data.count("COMPLETED"))))
                     student_data.append(GPA)                       
                     GPA=GPA/total_credits                 
                     student_data.append(GPA)                    
@@ -132,11 +176,12 @@ def Sgpa(data,input):
                     cse=len(df.index)+1
                     df.to_excel(output,sheet_name="CSE",index=False)
                     start_x=2
-                    delete()
+                    df=delete()
                 a=int(d[7])*100+1
                 #print("a=",a)
                 if int(d[7])==1:
-                    total_credits=civil_credits                
+                    total_credits=civil_credits   
+                    total_subs=civil_subs             
                 if int(d[7])==2:                                       
                     if start_x==2:
                         df.to_excel(output,sheet_name="CE",index=False,startrow=civil,header=None)
@@ -145,8 +190,9 @@ def Sgpa(data,input):
                         df.to_excel(output,sheet_name="CE",index=False)
                         #df.to_excel(output,sheet_name="CE stats",index=False)
                     total_credits=eee_credits
-                    delete()
-                    df["Roll_No"]=[]
+                    total_subs=eee_subs
+                    df=delete()
+                    #print(df)
                 if int(d[7])==3:
                     if start_x==2:
                         df.to_excel(output,sheet_name="EEE",index=False,startrow=eee,header=None)
@@ -155,8 +201,8 @@ def Sgpa(data,input):
                         df.to_excel(output,sheet_name="EEE",index=False)
                         #df.to_excel(output,sheet_name="EEE stats",index=False)
                     total_credits=mech_credits
-                    delete()
-                    df["Roll_No"]=[]
+                    total_subs=mech_subs
+                    df=delete()
                 if int(d[7])==4:
                     if start_x==2:
                         df.to_excel(output,sheet_name="ME",index=False,startrow=mech,header=None)
@@ -165,8 +211,8 @@ def Sgpa(data,input):
                         df.to_excel(output,sheet_name='ME',index=False)
                         #df.to_excel(output,sheet_name='ME stats',index=False)
                     total_credits=ece_credits
-                    delete()
-                    df["Roll_No"]=[]
+                    total_subs=ece_subs
+                    df=delete()
                 if int(d[7])==5:
                     if start_x==2:
                         df.to_excel(output,sheet_name="ECE",index=False,startrow=ece,header=None)
@@ -175,17 +221,18 @@ def Sgpa(data,input):
                         df.to_excel(output,sheet_name="ECE",index=False)
                         #df.to_excel(output,sheet_name="ECE stats",index=False)
                     total_credits=cse_credits
-                    delete()
-                    df["Roll_No"]=[]
+                    total_subs=cse_subs
+                    df=delete()
                 sub=[]
         
         #Adding subject name columns in the dataframe based on the subject code
-            if data.iloc[i,1] not in sub:            
-                try:                    
+            #print(total_subs)
+            if data.iloc[i,1] in total_subs: 
+                #rint(df.columns)         
+                if len(df.columns)-1<=len(total_subs):        
                     df[data['Subname'][i]+' ('+data.iloc[i,1]+')']=[]
-                    sub.append(data.iloc[i,1])
-                except:
-                    continue
+            else:
+                continue
 
             
             #Grades acquired based on the marks of the students 

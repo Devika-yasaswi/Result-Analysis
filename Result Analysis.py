@@ -90,8 +90,7 @@ def save():
         def calculation(data):                            
             rno_list=[]
             for i in range(len(data)):
-                x=int(data['Htno'][i][7:10])
-                rno_list.append(data['Htno'][i][0:6])
+                rno_list.append(str(data['Htno'][i])[0:6])
             new_rno_list=list(set(rno_list))
             new=[]
             for i in new_rno_list:
@@ -100,13 +99,12 @@ def save():
             new_df=pd.DataFrame(columns=data.columns)
             series1=str(int(series[0:2])+1)+"035A"
             for i in range(len(data)):
-                if data.iloc[i,0][0:6]== series or data.iloc[i,0][0:6]==series1:
+                if str(data.iloc[i,0])[0:6]== series or str(data.iloc[i,0])[0:6]==series1:
                     new_df.loc[len(new_df.index)]=list(data.iloc[i,:])
-            try:
-                Sgpa(new_df,input_file) 
-            except ZeroDivisionError:
-                wrong_file.grid(row=2,column=0,sticky='w',pady=6) 
-                return                      
+            Sgpa(new_df,input_file) 
+            #except:
+                #wrong_file.grid(row=2,column=0,sticky='w',pady=6) 
+                #return                      
             pymsgbox.rootWindowPosition="+700+350"
             result=alert(text="Result Analysis file generation is completed",title="Status",button="Ok")                            
             if result=="Ok":
@@ -143,6 +141,8 @@ def save():
                 data=read_excel(input_file_excel)
                 if "Htno" not in data.columns:
                     wrong_file.grid(row=2,column=0,sticky='w')
+                else:
+                    calculation(data)
     else:
         upload_result_label.grid(row=2,column=0,sticky='w')
 
