@@ -10,7 +10,7 @@ def branch_calculation(data,overall_stat,branch):
         temp_list.append(total)
         temp_list.append(grades.count("AB")+grades.count("ABSENT"))
         passed=grades.count("A+")+grades.count("A")+grades.count("B")+grades.count("C")+grades.count("D")+grades.count("E")+grades.count("COMPLE")+grades.count("COMPLETED")
-        temp_list.append(len(grades)-passed-grades.count("-"))
+        temp_list.append(len(grades)-passed-grades.count("-")-grades.count("WH"))
         temp_list.append(passed)
         temp_list.append(passed/total*100)
         df.loc[len(df.index)]=temp_list
@@ -21,7 +21,7 @@ def branch_calculation(data,overall_stat,branch):
         new=list(set(new))
         if len(new)==1 and (new[0]=="AB" or new[0]=="ABSENT"):
             count+=1
-        if len(new)!=1 and ("F" in new or "MP" in new or  "AB" in new or "ABSENT" in new or "MP" in new):
+        if len(new)!=1 and ("F" in new or "MP" in new or  "AB" in new or "ABSENT" in new or "MP" in new or "WH" in new):
             count1+=1
     new=[branch,len(data),len(data)-count,len(data)-count1,count1,(len(data)-count1)/(len(data)-count)*100]
     overall_stat.loc[len(overall_stat.index)]=new

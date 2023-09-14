@@ -161,7 +161,7 @@ def Sgpa(data,input):
                         student_data.append("Pass")
                     else:
                         student_data.append("Fail")
-                    student_data.append(student_data.count("F")+student_data.count("AB")+student_data.count("MP")+student_data.count("ABSENT"))
+                    student_data.append(student_data.count("F")+student_data.count("AB")+student_data.count("MP")+student_data.count("ABSENT")+student_data("WH"))
                     student_data.append(tc)
                     student_data.append(GBM/(len(total_subs)-(student_data.count("COMPLE")+student_data.count("COMPLETED"))))
                     student_data.append(GPA)                       
@@ -172,8 +172,8 @@ def Sgpa(data,input):
                     try:
                         df.loc[len(df.index)]=student_data 
                     except ValueError:
-                        print(total_subs)
-                        print(sub)
+                        #print(total_subs)
+                        #print(sub)
                         for b in range(len(total_subs)):
                              if total_subs[b] not in sub:
                                 #print(total_subs)
@@ -301,6 +301,9 @@ def Sgpa(data,input):
                         student_data.append(data.iloc[i,-2])
                         sub.append(data.iloc[i,2]+" "+data.iloc[i,1])
                 elif data.iloc[i,-2]=='COMPLETED' or data.iloc[i,-2]=='COMPLE':
+                        student_data.append(data.iloc[i,-2])
+                        sub.append(data.iloc[i,2]+" "+data.iloc[i,1])
+                elif data.iloc[i,-2]=='WH':
                         student_data.append(data.iloc[i,-2])
                         sub.append(data.iloc[i,2]+" "+data.iloc[i,1])
                 
