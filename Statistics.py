@@ -5,12 +5,12 @@ def branch_calculation(data,overall_stat,branch):
     for i in list(data.columns)[1:-8]:
         temp_list=[i]
         grades=data[i].tolist()
-        temp_list.append(len(grades))
-        total=len(grades)-(grades.count("AB")+grades.count("ABSENT"))
+        temp_list.append(len(grades)-grades.count("-"))
+        total=len(grades)-(grades.count("AB")+grades.count("ABSENT")+grades.count("-"))
         temp_list.append(total)
         temp_list.append(grades.count("AB")+grades.count("ABSENT"))
         passed=grades.count("A+")+grades.count("A")+grades.count("B")+grades.count("C")+grades.count("D")+grades.count("E")+grades.count("COMPLE")+grades.count("COMPLETED")
-        temp_list.append(len(grades)-passed)
+        temp_list.append(len(grades)-passed-grades.count("-"))
         temp_list.append(passed)
         temp_list.append(passed/total*100)
         df.loc[len(df.index)]=temp_list
@@ -52,46 +52,16 @@ def get_statistics(file):
     cse_data=read_excel(file,sheet_name=["CSE"])
     cse_data=cse_data["CSE"]
     overall_data=DataFrame(columns=["Branch","Total","Appeared","Pass","Fail","Percentage"])
-    try:
-        civil_df,civil=failure_count(civil_data)
-    except:
-        pass
-    try:
-        eee_df,eee=failure_count(eee_data)
-    except:
-        pass
-    try:
-        mech_df,mech=failure_count(mech_data)
-    except:
-        pass
-    try:
-        ece_df,ece=failure_count(ece_data)
-    except:
-        pass
-    try:
-        cse_df,cse=failure_count(cse_data)
-    except:
-        pass
-    try:
-        civil_data,overall_data=branch_calculation(civil_data,overall_data,"CE")
-    except:
-        pass
-    try:
-        eee_data,overall_data=branch_calculation(eee_data,overall_data,"EEE")
-    except:
-        pass
-    try:
-        mech_data,overall_data=branch_calculation(mech_data,overall_data,"ME")
-    except:
-        pass
-    try:
-        ece_data,overall_data=branch_calculation(ece_data,overall_data,"ECE")
-    except:
-        pass
-    try:
-        cse_data,overall_data=branch_calculation(cse_data,overall_data,"CSE")
-    except:
-        pass
+    civil_df,civil=failure_count(civil_data)
+    eee_df,eee=failure_count(eee_data)
+    mech_df,mech=failure_count(mech_data)
+    ece_df,ece=failure_count(ece_data)
+    cse_df,cse=failure_count(cse_data)
+    civil_data,overall_data=branch_calculation(civil_data,overall_data,"CE")
+    eee_data,overall_data=branch_calculation(eee_data,overall_data,"EEE")
+    mech_data,overall_data=branch_calculation(mech_data,overall_data,"ME")
+    ece_data,overall_data=branch_calculation(ece_data,overall_data,"ECE")
+    cse_data,overall_data=branch_calculation(cse_data,overall_data,"CSE")
     new=["Total"]
     new.append(sum(list(overall_data["Total"])))
     new.append(sum(list(overall_data["Appeared"])))
